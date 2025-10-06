@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Product Detail</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2Pkf5vSg2G5sV4nqjW5OfG1Gd7i7x3QO2p5Y2c1gH3cWlE3rjvPp2GK5xg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      .detail-container{max-width:1000px;margin:24px auto;padding:0 24px}
+      .back-link{display:inline-flex;align-items:center;gap:8px;color:var(--text);text-decoration:none;border:1px solid var(--border);border-radius:10px;padding:8px 12px}
+      .back-link:hover{background:var(--media-bg)}
+      .detail-card{display:grid;grid-template-columns:1fr;gap:16px}
+      @media (min-width: 768px){.detail-card{grid-template-columns: 1fr 1.2fr}}
+      .desc{color:var(--text);line-height:1.6;margin:8px 0 0 0}
+    </style>
+</head>
+<body>
+  <header class="page-header detail-container">
+    <a class="back-link" href="product.html"><i class="fa-solid fa-arrow-left"></i> Back to products</a>
+    <h1 style="margin-top:16px">Product Details</h1>
+  </header>
+
+  <main class="detail-container" id="detail-root">
+    <!-- Content injected by script -->
+  </main>
+
+  <script>
+    (function(){
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      const root = document.getElementById('detail-root');
+
+      if(!id){
+        root.innerHTML = '<p class="muted">No product selected.</p>';
+        return;
+      }
+
+      fetch(`https://fakestoreapi.com/products/${encodeURIComponent(id)}`)
+        .then(r => r.json())
+        .then(item => {
+          const card = document.createElement('div');
+          card.className = 'card detail-card';
+
+          const media = document.createElement('div');
+          media.className = 'card__media';
+          const img = document.createElement('img');
+          img.src = item.image;
+          img.alt = item.title;
+          img.loading = 'lazy';
+          media.appendChild(img);
+
+          const body = document.createElement('div');
+          body.className = 'card__body';
+
+          const title = document.createElement('h2');
+          title.className = 'card__title';
+          title.textContent = item.title;
+
+          const meta = document.createElement('div');
+          meta.className = 'card__meta';
+          const price = document.createElement('span');
+          price.className = 'card__price';
+          price.innerHTML = `<i class="fa-solid fa-tag"></i> $${Number(item.price).toFixed(2)}`;
+
+          const rating = document.createElement('span');
+          rating.className = 'card__rating';
+          if (item.rating && typeof item.rating.rate === 'number') {
+              rating.innerHTML = `<i class="fa-solid fa-star"></i> ${item.rating.rate.toFixed(1)} <span class="muted">(${item.rating.count || 0})</span>`;
+          }
+          meta.appendChild(price);
+          if (rating.innerHTML) meta.appendChild(rating);
+
+          const desc = document.createElement('p');
+          desc.className = 'desc';
+          desc.textContent = item.description || '';
+
+          const actions = document.createElement('div');
+          actions.className = 'card__actions';
+          const btn = document.createElement('button');
+          btn.className = 'btn btn-primary';
+          btn.type = 'button';
+          btn.innerHTML = '<i class="fa-solid fa-cart-plus"></i> Add to cart';
+          actions.appendChild(btn);
+
+          body.appendChild(title);
+          body.appendChild(meta);
+          body.appendChild(desc);
+          body.appendChild(actions);
+
+          card.appendChild(media);
+          card.appendChild(body);
+
+          root.appendChild(card);
+        })
+        .catch(err => {
+          console.error(err);
+          root.innerHTML = '<p class="muted">Failed to load product details.</p>';
+        });
+    })();
+  </script>
+</body>
+</html>

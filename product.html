@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products</title>
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2Pkf5vSg2G5sV4nqjW5OfG1Gd7i7x3QO2p5Y2c1gH3cWlE3rjvPp2GK5xg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="page-header">
+        <h1><i class="fa-solid fa-store"></i> Our Products</h1>
+        <p class="subtitle">Quality picks from FakeStore API</p>
+    </header>
+
+    <div id="product" class="product-grid">
+    </div>
+
+
+    <script>
+        const queryString = window.location.search; // Returns "?name=John&age=30
+        const urlParams = new URLSearchParams(queryString);
+
+        const lang = urlParams.get('lang');
+
+        fetch("https://fakestoreapi.com/products", {
+            method: 'get',   // post get put delete
+            headers: {
+                "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+            }
+        })
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (json) {
+                const grid = document.querySelector('#product');
+                for (let i = 0; i < json.length; i++) {
+                    const item = json[i];
+
+                    const card = document.createElement('div');
+                    card.className = 'card';
+
+                    const imgWrap = document.createElement('div');
+                    imgWrap.className = 'card__media';
+                    const img = document.createElement('img');
+                    img.src = item.image;
+                    img.alt = item.title;
+                    img.loading = 'lazy';
+                    imgWrap.appendChild(img);
+
+                    const body = document.createElement('div');
+                    body.className = 'card__body';
+
+                    const title = document.createElement('h2');
+                    title.className = 'card__title';
+                    title.textContent = item.title;
+
+                    // List view: omit meta/actions
+
+                    // No inline details in list view
+
+                    // Details button navigates to dedicated page
+                    const toggleWrap = document.createElement('div');
+                    toggleWrap.className = 'card__toggle';
+                    const toggleBtn = document.createElement('a');
+                    toggleBtn.className = 'btn btn-secondary';
+                    toggleBtn.href = `detail.html?id=${encodeURIComponent(item.id)}`;
+                    toggleBtn.innerHTML = '<i class="fa-solid fa-circle-info"></i> Details';
+                    toggleWrap.appendChild(toggleBtn);
+
+                    body.appendChild(title);
+                    body.appendChild(toggleWrap);
+
+                    // Show image and title (with Details link) initially
+                    card.appendChild(imgWrap);
+                    card.appendChild(body);
+
+                    grid.appendChild(card);
+                }
+            })
+            .catch(function (error) {
+                console.log('Request failed', error);
+            });
+    </script>
+</body>
+</html>
